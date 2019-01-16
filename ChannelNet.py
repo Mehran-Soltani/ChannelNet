@@ -10,9 +10,6 @@ import math
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 
-ckpt_dir = 'drive/codes/my_srcnn/checkpoint/'
-print('this is new :)')
-
 def psnr(target, ref):
     # assume RGB image
     target_data = numpy.array(target, dtype=float)
@@ -86,8 +83,8 @@ def DNCNN_model ():
     # 1st layer, Conv+relu
     x = Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding='same')(inpt)
     x = Activation('relu')(x)
-    # 15 layers, Conv+BN+relu
-    for i in range(5):
+    # 18 layers, Conv+BN+relu
+    for i in range(18):
         x = Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding='same')(x)
         x = BatchNormalization(axis=-1, epsilon=1e-3)(x)
         x = Activation('relu')(x)   
