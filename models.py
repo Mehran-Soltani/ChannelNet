@@ -28,7 +28,7 @@ def psnr(target, ref):
 
     return 20 * math.log10(255. / rmse)
 
-def interpolation(noisy , SNR , Number_of_pilot)
+def interpolation(noisy , SNR , Number_of_pilot , interp)
     noisy_image = np.zeros((40000,72,14,2))
 
     noisy_image[:,:,:,0] = np.real(noisy)
