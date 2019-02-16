@@ -78,21 +78,8 @@ def interpolation(noisy , SNR , Number_of_pilot , interp)
             interp_noisy[i,:,:,1] = z_intp
 
 
-
-    #perfect = loadmat('drive/codes/my_srcnn/Perfect_H_40000.mat')['My_perfect_H']
-    perfect = loadmat('drive/codes/my_srcnn/SUI5_perfect.mat')['SUI5_perfect_H']
-
-    perfect_image = np.zeros((40000,72,14,2))
-    perfect_image[:,:,:,0] = np.real(perfect)
-    perfect_image[:,:,:,1] = np.imag(perfect)
-
-
     interp_noisy = np.concatenate((interp_noisy[:,:,:,0], interp_noisy[:,:,:,1]), axis=0).reshape(80000, 72, 14, 1)
-    perfect_image = np.concatenate((perfect_image[:,:,:,0], perfect_image[:,:,:,1]), axis=0).reshape(80000, 72, 14, 1)      
-
-    #np.save('drive/codes/my_srcnn/results_22_36_rbf.npy',interp_noisy)
-
-    #np.save('drive/codes/my_srcnn/SUI5_12_48_rbf.npy',interp_noisy)
+   
     
     return interp_noisy
 
@@ -127,7 +114,7 @@ def SRCNN_train(train_data ,train_label, val_data , val_label , channel_model , 
 
 
 def SRCNN_predict(input_data , channel_model , num_pilots , SNR):
-    srcnn_model = SRCNN_predict_model()
+    srcnn_model = SRCNN_model()
     srcnn_model.load_weights("SRCNN_" + channel_model +"_"+ str(num_pilots) + "_"  + str(SNR) + ".h5")
     predicted  = srcnn_model.predict(input_data)
     return predicted
