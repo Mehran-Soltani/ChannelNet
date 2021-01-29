@@ -16,10 +16,7 @@ if __name__ == "__main__":
     noisy_input = loadmat("Noisy_" + channel_model + "_" + "SNR_" + str(SNR) + ".mat") [channel_model+"_noisy_"+ str(SNR)]             
                       
     interp_noisy = interpolation(noisy_input , SNR , Number_of_pilots , 'rbf')
-    
-    
-    #interp_noisy = numpy.load('drive/codes/my_srcnn/SUI5_12_48_rbf.npy')
-    #perfect = loadmat('drive/codes/my_srcnn/SUI5_perfect.mat')['SUI5_perfect_H']
+
     perfect_image = numpy.zeros((len(perfect),72,14,2))
     perfect_image[:,:,:,0] = numpy.real(perfect)
     perfect_image[:,:,:,1] = numpy.imag(perfect)
