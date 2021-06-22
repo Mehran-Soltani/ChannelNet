@@ -14,6 +14,8 @@ import numpy as np
 import math
 from scipy import interpolate
 #from scipy.misc import imresize
+import os
+from tqdm import tqdm
 
 
 def psnr(target, ref):
@@ -28,7 +30,8 @@ def psnr(target, ref):
 
     return 20 * math.log10(255. / rmse)
 
-def interpolation(noisy , SNR , Number_of_pilot , interp)
+def interpolation(noisy, SNR, Number_of_pilot, interp):
+    print("start!")
     noisy_image = np.zeros((40000,72,14,2))
 
     noisy_image[:,:,:,0] = np.real(noisy)
@@ -53,9 +56,10 @@ def interpolation(noisy , SNR , Number_of_pilot , interp)
 
 
 
-    interp_noisy = np.zeros((40000,72,14,2))
-
+    interp_noisy = np.zeros((40000,72,14,2))  
+    pbar = tqdm(total=len(noisy))
     for i in range(len(noisy)):
+        pbar.update(1)
         z = [noisy_image[i,j,k,0] for j,k in zip(r,c)]
         if(interp == 'rbf'):
             f = interpolate.Rbf(np.array(r).astype(float), np.array(c).astype(float), z,function='gaussian')
@@ -76,11 +80,9 @@ def interpolation(noisy , SNR , Number_of_pilot , interp)
             tck = interpolate.bisplrep(np.array(r).astype(float), np.array(c).astype(float), z)
             z_intp = interpolate.bisplev(range(72),range(14),tck)
             interp_noisy[i,:,:,1] = z_intp
+    pbar.close()
 
-
-    interp_noisy = np.concatenate((interp_noisy[:,:,:,0], interp_noisy[:,:,:,1]), axis=0).reshape(80000, 72, 14, 1)
-   
-    
+    interp_noisy = np.concatenate((interp_noisy[:,:,:,0], interp_noisy[:,:,:,1]), axis=0).reshape(80000, 72, 14, 1)  
     return interp_noisy
 
 def SRCNN_model():
@@ -100,7 +102,6 @@ def SRCNN_model():
 def SRCNN_train(train_data ,train_label, val_data , val_label , channel_model , num_pilots , SNR ):
     srcnn_model = SRCNN_model()
     print(srcnn_model.summary())
-    
     checkpoint = ModelCheckpoint("SRCNN_check.h5", monitor='val_loss', verbose=1, save_best_only=True,
                                  save_weights_only=False, mode='min')
     callbacks_list = [checkpoint]
@@ -122,7 +123,7 @@ def SRCNN_predict(input_data , channel_model , num_pilots , SNR):
   
 def DNCNN_model ():
   
-    inpt = Input(shape=(None,None,1))
+    inpt = Input(shape=(None,None,1)) # (72,14,1)
     # 1st layer, Conv+relu
     x = Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding='same')(inpt)
     x = Activation('relu')(x)
@@ -130,13 +131,13 @@ def DNCNN_model ():
     for i in range(18):
         x = Conv2D(filters=64, kernel_size=(3,3), strides=(1,1), padding='same')(x)
         x = BatchNormalization(axis=-1, epsilon=1e-3)(x)
-        x = Activation('relu')(x)   
+        x = Activation('relu')(x)
     # last layer, Conv
     x = Conv2D(filters=1, kernel_size=(3,3), strides=(1,1), padding='same')(x)
     x = Subtract()([inpt, x])   # input - noise
     model = Model(inputs=inpt, outputs=x)
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-8) 
-    model.compile(optimizer=adam, loss='mean_squared_error', metrics=['mean_squared_error'])    
+    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-8)
+    model.compile(optimizer=adam, loss='mean_squared_error', metrics=['mean_squared_error'])
     return model
 
 def DNCNN_train(train_data ,train_label, val_data , val_label, channel_model , num_pilots , SNR ):
