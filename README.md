@@ -1,5 +1,4 @@
 # Deep Learning-Based Channel Estimation
-Implementation of the paper "Deep Learning-Based Channel Estimation" https://arxiv.org/abs/1810.05893
 
 ## Introduction
 This repo contains a deep learning (DL) algorithm for channel estimation in communication systems. And the aim is to find the unknown values of the channel response using some known values at the pilot locations. 
